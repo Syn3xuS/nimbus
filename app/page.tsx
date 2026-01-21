@@ -1,3 +1,3 @@
-export default function Home() {
-	return <>dsfisjfioo</>;
+export default function page() {
+	return <>Главная страница</>;
 }
