@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./Header.module.css";
-import logo from "@/public/vercel.svg";
+import logo from "@/public/logo.svg";
 
 const Header = () => {
 	const [visible, setVisible] = useState(true);
