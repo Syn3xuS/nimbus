@@ -1,3 +1,7 @@
 export default function page() {
-	return <>Главная страница</>;
+	return (
+		<>
+			<p>Главная страница</p>
+		</>
+	);
 }
