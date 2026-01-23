@@ -14,12 +14,9 @@ const Header = () => {
 		const onScroll = () => {
 			const currentScrollY = window.scrollY;
 
-			// если скроллим вверх — показываем
 			if (currentScrollY < lastScrollY) {
 				setVisible(true);
-			}
-			// если вниз и не в самом верху — скрываем
-			else if (currentScrollY > lastScrollY && currentScrollY > 25) {
+			} else if (currentScrollY > lastScrollY && currentScrollY > 25) {
 				setVisible(false);
 			}
 
@@ -43,6 +40,15 @@ const Header = () => {
 						src={logo}
 						alt="Logo"
 					/>
+				</Link>
+			</div>
+
+			<div className={styles.authButtons}>
+				<Link href="/auth/login" className={styles.signIn}>
+					Sign In
+				</Link>
+				<Link href="/auth/register" className={styles.signUp}>
+					Sign Up
 				</Link>
 			</div>
 		</header>
