@@ -1,69 +1,55 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function page() {
+export default function Page() {
 	const router = useRouter();
 
 	const [email, setEmail] = useState("");
+	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
 
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setLoading(true);
-		setError(null);
 
-		try {
-			const res = await fetch("/api/auth/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password }),
-			});
+		const res = await fetch("/api/auth/register", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				email,
+				username,
+				password,
+			}),
+		});
 
-			const data = await res.json();
-
-			if (!res.ok) {
-				throw new Error(data.message);
-			}
-
-			// после регистрации
-			router.push("/auth/login");
-		} catch (err) {
-			if (err instanceof Error) setError(err.message);
-		} finally {
-			setLoading(false);
+		if (res.ok) {
+			router.push("/");
 		}
 	};
 
 	return (
 		<form onSubmit={onSubmit}>
-			<h1>Регистрация</h1>
-
 			<input
-				type="email"
 				value={email}
 				onChange={(e) => setEmail(e.target.value)}
 				placeholder="Email"
-				required
+			/>
+
+			<input
+				value={username}
+				onChange={(e) => setUsername(e.target.value)}
+				placeholder="Username"
 			/>
 
 			<input
 				type="password"
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
-				placeholder="Пароль"
-				required
+				placeholder="Password"
 			/>
 
-			<button disabled={loading}>
-				{loading ? "Регистрация..." : "Зарегистрироваться"}
-			</button>
-
-			{error && <p style={{ color: "red" }}>{error}</p>}
+			<button>Register</button>
 		</form>
 	);
 }

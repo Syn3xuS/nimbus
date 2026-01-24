@@ -1,0 +1,48 @@
+{
+  "users": [
+    {
+      "id": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "email": "1@gmail.com",
+      "username": "botik1",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=4$wBKvAHC/oslK6ok2w74t8A$r96I7LcvpvRQtMxnGOlouHpVChH5OiY7kWk1ByZbTuc",
+      "createdAt": "2026-01-24T11:15:18.871Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "e7a8b98d-6069-4365-bd70-4caf53257140",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:15:18.876Z"
+    },
+    {
+      "token": "13a406be-3642-4ffd-b66b-acabcf504e6f",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:19:56.692Z"
+    },
+    {
+      "token": "4c616451-4f74-432d-a18d-5e1193863bd4",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:22:53.559Z"
+    },
+    {
+      "token": "3df70ecb-427f-411f-bdaf-5e9f0c9a2362",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:29:42.387Z"
+    },
+    {
+      "token": "d53b9442-ffd8-45c9-b044-3e17a3777d29",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:30:07.506Z"
+    },
+    {
+      "token": "35b56185-88d4-4aa9-9c73-5d9dd1f38720",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:30:34.883Z"
+    },
+    {
+      "token": "d7fa36bb-f855-4d70-bc2f-5814bcefc601",
+      "userId": "a74d7f11-44fd-4ea8-86f0-f780e2d9451d",
+      "createdAt": "2026-01-24T11:31:34.159Z"
+    }
+  ]
+}

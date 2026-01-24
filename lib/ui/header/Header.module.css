@@ -1,4 +1,3 @@
-
 .header {
 	position: sticky;
 	top: 0;
@@ -17,8 +16,6 @@
 	transition: transform 0.3s ease;
 	padding: 0 1rem;
 }
-
-
 
 .brand_banner {
 	height: 100%;
@@ -66,4 +63,10 @@
 
 .signUp:hover {
 	opacity: 0.85;
+}
+
+.username {
+	display: block;
+	padding: 2px 18px;
+	border-bottom: rgb(255, 255, 255) solid 2px;
 }

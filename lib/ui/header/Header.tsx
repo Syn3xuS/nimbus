@@ -27,31 +27,65 @@ const Header = () => {
 		return () => window.removeEventListener("scroll", onScroll);
 	}, [lastScrollY]);
 
-	return (
-		<header
-			className={`${styles.header} ${
-				visible ? styles.show : styles.hide
-			}`}
-		>
-			<div className={styles.brand_banner}>
-				<Link href="/">
-					<Image
-						className={styles.brand_banner_Logo}
-						src={logo}
-						alt="Logo"
-					/>
-				</Link>
-			</div>
+	const [username, setUsername] = useState<string | null>(null);
+	const [loading, setLoading] = useState(true);
 
-			<div className={styles.authButtons}>
-				<Link href="/auth/login" className={styles.signIn}>
-					Sign In
-				</Link>
-				<Link href="/auth/register" className={styles.signUp}>
-					Sign Up
-				</Link>
-			</div>
-		</header>
+	useEffect(() => {
+		const loadMe = async () => {
+			try {
+				const res = await fetch("/api/auth/me");
+				if (!res.ok) return;
+
+				const data = await res.json();
+				if (data?.user?.username) {
+					setUsername(data.user.username);
+				}
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadMe();
+	}, []);
+
+	return (
+		<>
+			<header
+				className={`${styles.header} ${
+					visible ? styles.show : styles.hide
+				}`}
+			>
+				<div className={styles.brand_banner}>
+					<Link href="/">
+						<Image
+							className={styles.brand_banner_Logo}
+							src={logo}
+							alt="Logo"
+						/>
+					</Link>
+				</div>
+
+				<div className={styles.authButtons}>
+					{loading ? null : username ? (
+						<Link href={`/profile/${username}`} className={styles.username}>
+							{username}
+						</Link>
+					) : (
+						<>
+							<Link href="/auth/login" className={styles.signIn}>
+								Sign In
+							</Link>
+							<Link
+								href="/auth/register"
+								className={styles.signUp}
+							>
+								Sign Up
+							</Link>
+						</>
+					)}
+				</div>
+			</header>
+		</>
 	);
 };
 

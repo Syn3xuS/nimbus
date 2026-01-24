@@ -1,24 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { registerUser } from "@/lib/services/auth/register";
+import { readDB, writeDB } from "@/lib/db/db";
 
-export async function POST(req: Request) {
-	try {
-		const body = await req.json();
+export async function POST(req: NextRequest) {
+	const { email, username, password } = await req.json();
 
-		const result = await registerUser(body);
+	const user = await registerUser({ email, username, password });
 
-		return NextResponse.json(result, { status: 201 });
-	} catch (error) {
-		if (error instanceof Error) {
-			return NextResponse.json(
-				{ message: error.message },
-				{ status: 400 }
-			);
-		}
+	const token = crypto.randomUUID();
 
-		return NextResponse.json(
-			{ message: "Unknown error" },
-			{ status: 500 }
-		);
-	}
+	const db = await readDB();
+	db.sessions.push({
+		token,
+		userId: user.id,
+		createdAt: new Date().toISOString(),
+	});
+	await writeDB(db);
+
+	const res = NextResponse.json({ ok: true });
+
+	res.cookies.set("auth_token", token, {
+		httpOnly: true,
+		path: "/",
+	});
+
+	return res;
 }

@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import { loginUser } from "@/lib/services/auth/login";
+import { readDB, writeDB } from "@/lib/db/db";
 
-export async function GET(req: NextRequest) {
-	// const { email, password } = await req.json();
-	const { searchParams } = new URL(req.url);
+export async function POST(req: NextRequest) {
+	try {
+		const { email, password } = await req.json();
 
-	const email = searchParams.get("email");
-	const password = searchParams.get("password");
+		const user = await loginUser({ email, password });
 
-	return NextResponse.json({ message: `ТЫ ЛОХ, ${email}` }, { status: 209 });
-	// if (!email || !password) {
-	// return NextResponse.json({ error: "Invalid data" }, { status: 400 });
-	// }
+		const token = crypto.randomUUID();
 
-	// const user = await login(email, password);
+		const db = await readDB();
+		db.sessions.push({
+			token,
+			userId: user.id,
+			createdAt: new Date().toISOString(),
+		});
+		await writeDB(db);
 
-	// return NextResponse.json({ user });
+		const res = NextResponse.json({ ok: true });
+
+		res.cookies.set("auth_token", token, {
+			httpOnly: true,
+			path: "/",
+		});
+
+		return res;
+	} catch (e) {
+		return NextResponse.json(
+			{
+				message: e instanceof Error ? e.message : "Login failed",
+			},
+			{ status: 401 },
+		);
+	}
 }
