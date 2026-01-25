@@ -1,0 +1,21 @@
+.brand_banner {
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+.brand_banner_Link {
+	height: 100%;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.brand_banner_Logo {
+	height: 100%;
+	width: auto;
+}
+.brand_banner_Text {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--text);
+}

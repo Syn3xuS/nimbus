@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Case from "@/lib/ui/case/Case";
 
 export default function Page() {
 	const router = useRouter();
@@ -30,23 +31,27 @@ export default function Page() {
 	};
 
 	return (
-		<form onSubmit={onSubmit}>
-			<input
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-				placeholder="Email"
-			/>
+		<>
+			<Case>
+				<form onSubmit={onSubmit}>
+					<input
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						placeholder="Email"
+					/>
 
-			<input
-				type="password"
-				value={password}
-				onChange={(e) => setPassword(e.target.value)}
-				placeholder="Password"
-			/>
+					<input
+						type="password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						placeholder="Password"
+					/>
 
-			<button>Login</button>
+					<button>Login</button>
 
-			{error && <p>{error}</p>}
-		</form>
+					{error && <p>{error}</p>}
+				</form>
+			</Case>
+		</>
 	);
 }

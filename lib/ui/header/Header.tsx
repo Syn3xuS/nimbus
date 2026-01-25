@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import styles from "./Header.module.css";
-import logo from "@/public/logo.svg";
+
+import Brand_banner from "./brand_banner/Brand_banner";
 
 const Header = () => {
 	const [visible, setVisible] = useState(true);
@@ -55,19 +55,14 @@ const Header = () => {
 					visible ? styles.show : styles.hide
 				}`}
 			>
-				<div className={styles.brand_banner}>
-					<Link href="/">
-						<Image
-							className={styles.brand_banner_Logo}
-							src={logo}
-							alt="Logo"
-						/>
-					</Link>
-				</div>
+				<Brand_banner></Brand_banner>
 
 				<div className={styles.authButtons}>
 					{loading ? null : username ? (
-						<Link href={`/profile/${username}`} className={styles.username}>
+						<Link
+							href={`/profile/${username}`}
+							className={styles.username}
+						>
 							{username}
 						</Link>
 					) : (

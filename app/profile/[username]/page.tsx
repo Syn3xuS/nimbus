@@ -1,3 +1,5 @@
+import Case from "@/lib/ui/case/Case";
+
 type Props = {
 	params: Promise<{ username: string }>; // <-- note the Promise
 };
@@ -21,10 +23,14 @@ export default async function page({ params }: Props) {
 	}
 
 	return (
-		<div>
-			<h1>{data.user.username}</h1>
-			<p>Email: {data.user.email}</p>
-			<p>Joined: {data.user.createdAt}</p>
-		</div>
+		<>
+		<Case>
+			<div>
+				<h1>{data.user.username}</h1>
+				<p>Email: {data.user.email}</p>
+				<p>Joined: {data.user.createdAt}</p>
+			</div>
+		</Case>
+		</>
 	);
 }

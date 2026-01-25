@@ -1,3 +1,9 @@
+import Case from "@/lib/ui/case/Case";
+
 export default function page() {
-	return <>Страница настроек</>;
+	return (
+		<>
+			<Case>Страница настроек</Case>
+		</>
+	);
 }
