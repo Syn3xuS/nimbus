@@ -17,8 +17,13 @@
 	padding: 0 1rem;
 }
 
+.show {
+	transform: translateY(0);
+}
 
-
+.hide {
+	transform: translateY(-100%);
+}
 
 /* Кнопки авторизации */
 .authButtons {
