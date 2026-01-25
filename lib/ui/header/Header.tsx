@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./Header.module.css";
 
+import { Button, Button_fill } from "@/lib/ui/Buttons/Buttons";
+import User_card from "@/lib/ui/header/user_card/User_card";
 import Brand_banner from "./brand_banner/Brand_banner";
 
 const Header = () => {
@@ -29,6 +31,7 @@ const Header = () => {
 
 	const [username, setUsername] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const avatar_link = "";
 
 	useEffect(() => {
 		const loadMe = async () => {
@@ -57,24 +60,24 @@ const Header = () => {
 			>
 				<Brand_banner></Brand_banner>
 
-				<div className={styles.authButtons}>
+				<div className="authButtons">
 					{loading ? null : username ? (
-						<Link
-							href={`/profile/${username}`}
-							className={styles.username}
-						>
-							{username}
-						</Link>
+						<>
+							<User_card
+								username={username}
+								avatar_link={avatar_link}
+							/>
+						</>
 					) : (
 						<>
 							<Link href="/auth/login" className={styles.signIn}>
-								Sign In
+								<Button>Sign In</Button>
 							</Link>
 							<Link
 								href="/auth/register"
 								className={styles.signUp}
 							>
-								Sign Up
+								<Button_fill>Sign Up</Button_fill>
 							</Link>
 						</>
 					)}
