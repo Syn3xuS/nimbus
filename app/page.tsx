@@ -17,11 +17,6 @@ export default function page() {
 							Регистрация
 						</Link>
 					</p>
-					<p>
-						<Link className="link" href={"/auth"}>
-							Аутентификация
-						</Link>
-					</p>
 				</div>
 			</Case>
 		</>
