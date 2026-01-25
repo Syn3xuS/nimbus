@@ -1,19 +1,110 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import fs from "fs/promises";
-import path from "path";
+import { Pool } from "pg";
+import { initDb } from "./init";
 
-const DB_PATH = path.join(process.cwd(), "db.json");
-
-type DB = {
-	users: any[];
-	sessions: any[];
+type User = {
+	id: string;
+	email: string;
+	username: string;
+	passwordHash: string;
+	createdAt: string;
 };
 
+type Session = {
+	token: string;
+	userId: string;
+	createdAt: string;
+};
+
+type DB = {
+	users: User[];
+	sessions: Session[];
+};
+
+let pool: Pool | null = null;
+
+function getPool() {
+	if (!pool) {
+		pool = new Pool({
+			user: "dev",
+			password: "dev",
+			host: "localhost",
+			port: 5432, // Docker Postgres
+			database: "app",
+		});
+	}
+	return pool;
+}
+
 export async function readDB(): Promise<DB> {
-	const data = await fs.readFile(DB_PATH, "utf-8");
-	return JSON.parse(data);
+	const db = getPool();
+	await initDb(db);
+
+	const [usersRes, sessionsRes] = await Promise.all([
+		db.query("SELECT * FROM users ORDER BY created_at"),
+		db.query("SELECT * FROM sessions ORDER BY created_at"),
+	]);
+
+	return {
+		users: usersRes.rows.map((u) => ({
+			id: u.id,
+			email: u.email,
+			username: u.username,
+			passwordHash: u.password_hash,
+			createdAt: u.created_at,
+		})),
+		sessions: sessionsRes.rows.map((s) => ({
+			token: s.token,
+			userId: s.user_id,
+			createdAt: s.created_at,
+		})),
+	};
 }
 
 export async function writeDB(data: DB) {
-	await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+	const db = getPool();
+	await initDb(db);
+
+	const client = await db.connect();
+	try {
+		await client.query("BEGIN");
+
+		// Очистка таблиц
+		await client.query("TRUNCATE users, sessions RESTART IDENTITY CASCADE");
+
+		// Вставка пользователей
+		for (const user of data.users) {
+			// dev fallback для старых данных
+			const passwordHash = user.passwordHash ?? "temp_hash";
+			const createdAt = user.createdAt ?? new Date().toISOString();
+
+			await client.query(
+				`
+        INSERT INTO users (id, email, username, password_hash, created_at)
+        VALUES ($1, $2, $3, $4, $5)
+        `,
+				[user.id, user.email, user.username, passwordHash, createdAt],
+			);
+		}
+
+		// Вставка сессий
+		for (const session of data.sessions) {
+			const createdAt = session.createdAt ?? new Date().toISOString();
+
+			await client.query(
+				`
+        INSERT INTO sessions (token, user_id, created_at)
+        VALUES ($1, $2, $3)
+        `,
+				[session.token, session.userId, createdAt],
+			);
+		}
+
+		await client.query("COMMIT");
+	} catch (err) {
+		await client.query("ROLLBACK");
+		throw err;
+	} finally {
+		client.release();
+	}
 }
