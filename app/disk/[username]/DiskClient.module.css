@@ -1,4 +1,4 @@
-/* CSS module using only CSS variables */
+
 
 .container {
 	background: var(--bg);

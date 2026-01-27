@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
 	S3Client,
 	PutObjectCommand,
@@ -35,16 +35,14 @@ async function ensureBucketExists() {
 	try {
 		await s3.send(new CreateBucketCommand({ Bucket: MINIO_BUCKET }));
 	} catch (err: any) {
-		// Ignore if bucket already exists / owned by you. Different SDKs expose code/name/message.
-		const code = err?.Code ?? err?.code ?? err?.name;
+				const code = err?.Code ?? err?.code ?? err?.name;
 		const msg = String(err?.message ?? "");
 		const isAlreadyOwned =
 			code === "BucketAlreadyOwnedByYou" ||
 			code === "BucketAlreadyExists" ||
 			/BucketAlreadyOwnedByYou|BucketAlreadyExists/.test(msg);
 		if (!isAlreadyOwned) {
-			// rethrow for unexpected errors
-			throw err;
+						throw err;
 		}
 	}
 }
@@ -126,12 +124,6 @@ export async function listFilesByUsername(username: string) {
      ORDER BY f.created_at DESC`,
 		[username],
 	);
-	// debug: log rows to help troubleshoot missing folders
-	try {
-		console.debug("[files] listFilesByUsername rows:", res.rows);
-	} catch (e) {
-		// ignore
-	}
 	return res.rows.map((r: any) => ({
 		id: r.id,
 		filename: r.filename,
@@ -147,8 +139,7 @@ export async function listFilesByUsername(username: string) {
 export async function deleteFile(userId: string, id: string) {
 	const db = getPool();
 	await initDb(db);
-	// fetch meta to determine if this is a folder
-	const metaRes = await db.query(
+		const metaRes = await db.query(
 		`SELECT id, filename, path, is_folder, object_key FROM files WHERE id = $1 AND user_id = $2`,
 		[id, userId],
 	);
@@ -158,8 +149,7 @@ export async function deleteFile(userId: string, id: string) {
 	const meta = metaRes.rows[0] as any;
 
 	if (!meta.is_folder) {
-		// single file delete
-		const key = meta.object_key as string | null;
+				const key = meta.object_key as string | null;
 		if (key) {
 			await ensureBucketExists();
 			await s3.send(
@@ -170,12 +160,10 @@ export async function deleteFile(userId: string, id: string) {
 		return true;
 	}
 
-	// folder: compute full folder path and delete all rows under it
-	const folderFullPath =
+		const folderFullPath =
 		(meta.path ?? "/").replace(/\/$/, "") + "/" + meta.filename + "/";
 
-	// find all rows that are inside this folder (files and subfolders)
-	const childrenRes = await db.query(
+		const childrenRes = await db.query(
 		`SELECT id, object_key FROM files WHERE path = $1 OR path LIKE $1 || '%'`,
 		[folderFullPath],
 	);
@@ -183,11 +171,9 @@ export async function deleteFile(userId: string, id: string) {
 	const toDelete: { id: string; key: string | null }[] = childrenRes.rows.map(
 		(r: any) => ({ id: r.id, key: r.object_key ?? null }),
 	);
-	// include the folder row itself
-	toDelete.push({ id: meta.id, key: meta.object_key ?? null });
+		toDelete.push({ id: meta.id, key: meta.object_key ?? null });
 
-	// delete objects in storage (if any)
-	const keys = toDelete.map((t) => t.key).filter(Boolean) as string[];
+		const keys = toDelete.map((t) => t.key).filter(Boolean) as string[];
 	if (keys.length > 0) {
 		await ensureBucketExists();
 		for (const k of keys) {
@@ -201,8 +187,7 @@ export async function deleteFile(userId: string, id: string) {
 		}
 	}
 
-	// delete DB rows in a transaction
-	try {
+		try {
 		await db.query("BEGIN");
 		for (const item of toDelete) {
 			await db.query(`DELETE FROM files WHERE id = $1`, [item.id]);

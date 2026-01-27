@@ -28,8 +28,7 @@ function getPool() {
 			user: "dev",
 			password: "dev",
 			host: "localhost",
-			port: 5432, // Docker Postgres
-			database: "app",
+			port: 5432, 			database: "app",
 		});
 	}
 	return pool;
@@ -70,13 +69,10 @@ export async function writeDB(data: DB) {
 	try {
 		await client.query("BEGIN");
 
-		// Очистка таблиц
-		await client.query("TRUNCATE users, sessions RESTART IDENTITY CASCADE");
+				await client.query("TRUNCATE users, sessions RESTART IDENTITY CASCADE");
 
-		// Вставка пользователей
-		for (const user of data.users) {
-			// dev fallback для старых данных
-			const passwordHash = user.passwordHash ?? "temp_hash";
+				for (const user of data.users) {
+						const passwordHash = user.passwordHash ?? "temp_hash";
 			const createdAt = user.createdAt ?? new Date().toISOString();
 
 			await client.query(
@@ -88,8 +84,7 @@ export async function writeDB(data: DB) {
 			);
 		}
 
-		// Вставка сессий
-		for (const session of data.sessions) {
+				for (const session of data.sessions) {
 			const createdAt = session.createdAt ?? new Date().toISOString();
 
 			await client.query(

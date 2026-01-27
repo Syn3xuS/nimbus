@@ -36,8 +36,7 @@ const DiskClient = ({ username }: { username: string }) => {
 
 	useEffect(() => {
 		load();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [username]);
+			}, [username]);
 
 	const folders = items.filter(
 		(i) => i.isFolder && (i.path ?? "/") === currentPath,

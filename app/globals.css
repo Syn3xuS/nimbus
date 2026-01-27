@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Тема по умолчанию ( Белая тема ) */
+
 :root {
 	--background: #fbfbfb;
 	--backgroundTo: #f4f4f4;
@@ -21,7 +21,7 @@
 	--font-mono: var(--font-geist-mono);
 }
 
-/* Тёмная тема */
+
 @media (prefers-color-scheme: dark) {
 	:root {
 		--background: #0a0a0a;

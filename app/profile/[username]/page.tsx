@@ -1,8 +1,7 @@
 import Case from "@/lib/ui/case/Case";
 
 type Props = {
-	params: Promise<{ username: string }>; // <-- note the Promise
-};
+	params: Promise<{ username: string }>; };
 
 async function getUser(username: string) {
 	const res = await fetch(`http://localhost:3000/api/users/${username}`, {
@@ -14,10 +13,8 @@ async function getUser(username: string) {
 }
 
 export default async function page({ params }: Props) {
-	const { username } = await params; // <-- unwrap the promise here
-
-	const data = await getUser(username); // now this works
-
+	const { username } = await params; 
+	const data = await getUser(username); 
 	if (!data) {
 		return <h1>User not found</h1>;
 	}

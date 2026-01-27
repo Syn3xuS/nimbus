@@ -6,8 +6,7 @@ export async function GET(
 	context: { params: Promise<{ username: string }> },
 ) {
 	const { params } = context;
-	const { username } = await params; // unwrap the promise
-
+	const { username } = await params; 
 	const db = await readDB();
 
 	const user = db.users.find((u) => u.username === username);
@@ -22,8 +21,7 @@ export async function GET(
 	return NextResponse.json({
 		user: {
 			username: user.username,
-			email: user.email, // optional
-			createdAt: user.createdAt,
+			email: user.email, 			createdAt: user.createdAt,
 		},
 	});
 }

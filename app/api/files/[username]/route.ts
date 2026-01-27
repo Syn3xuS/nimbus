@@ -18,8 +18,7 @@ export async function GET(
 	const db = getPool();
 	await initDb(db);
 
-	// auth: require valid session cookie and ensure owner
-	const token = req.cookies.get("auth_token")?.value;
+		const token = req.cookies.get("auth_token")?.value;
 	if (!token) {
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 	}
@@ -39,8 +38,7 @@ export async function GET(
 
 	const sessionUserId = sessRes.rows[0].user_id;
 
-	// ensure requested username exists and is owned by session user
-	const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
+		const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
 		username,
 	]);
 	if (userRes.rowCount === 0)
@@ -52,8 +50,7 @@ export async function GET(
 	if (ownerId !== sessionUserId)
 		return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
-	// support direct download redirect via query param
-	const downloadId = req.nextUrl.searchParams.get("downloadId");
+		const downloadId = req.nextUrl.searchParams.get("downloadId");
 	if (downloadId) {
 		const res = await db.query(
 			`SELECT f.object_key, f.filename, f.content_type FROM files f JOIN users u ON f.user_id = u.id WHERE f.id = $1 AND u.username = $2`,
@@ -69,8 +66,7 @@ export async function GET(
 		const contentType =
 			res.rows[0].content_type ?? "application/octet-stream";
 
-		// proxy the object stream through the API to avoid exposing presigned URL
-		const s3res = await getObjectStream(key);
+				const s3res = await getObjectStream(key);
 		const body = s3res.Body as unknown as BodyInit;
 		if (!body)
 			return NextResponse.json(
@@ -88,8 +84,7 @@ export async function GET(
 		return new Response(body, { status: 200, headers });
 	}
 
-	// otherwise list files but DO NOT expose presigned URLs: return internal download path
-	const files = await listFilesByUsername(username);
+		const files = await listFilesByUsername(username);
 	const withUrls = files.map((f) => ({
 		...f,
 		url: `/api/files/${username}?downloadId=${f.id}`,
@@ -118,8 +113,7 @@ export async function POST(
 		);
 	const userId = userRes.rows[0].id;
 
-	// auth: require session and ensure session user matches target user
-	const token = req.cookies.get("auth_token")?.value;
+		const token = req.cookies.get("auth_token")?.value;
 	if (!token)
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
@@ -182,8 +176,7 @@ export async function POST(
 				{ message: "name required" },
 				{ status: 400 },
 			);
-		// create folder entry: store folder as an entry in the parent path
-		const parentPath = (path ?? "/").replace(/\/$/, "") + "/";
+				const parentPath = (path ?? "/").replace(/\/$/, "") + "/";
 		const file = await registerFile(userId, null, name, parentPath, true);
 		return NextResponse.json({ folder: file });
 	}
