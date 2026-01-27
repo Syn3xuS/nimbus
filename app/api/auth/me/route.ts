@@ -11,12 +11,22 @@ export async function GET(req: NextRequest) {
 
 	const session = db.sessions.find((s) => s.token === token);
 	if (!session) {
-		return NextResponse.json({ user: null }, { status: 401 });
+		const res = NextResponse.json({ user: null }, { status: 401 });
+		res.cookies.set("auth_token", "", {
+			path: "/",
+			maxAge: 0,
+		});
+		return res;
 	}
 
 	const user = db.users.find((u) => u.id === session.userId);
 	if (!user) {
-		return NextResponse.json({ user: null }, { status: 401 });
+		const res = NextResponse.json({ user: null }, { status: 401 });
+		res.cookies.set("auth_token", "", {
+			path: "/",
+			maxAge: 0,
+		});
+		return res;
 	}
 
 	return NextResponse.json({

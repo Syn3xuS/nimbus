@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Case from "@/lib/ui/case/Case";
 
 export default function Page() {
-	const router = useRouter();
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");

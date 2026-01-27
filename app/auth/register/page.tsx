@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Case from "@/lib/ui/case/Case";
 
 export default function Page() {
-	const router = useRouter();
+	const [error, setError] = useState<string | null>(null);
 
 	const [email, setEmail] = useState("");
 	const [username, setUsername] = useState("");
@@ -25,7 +24,11 @@ export default function Page() {
 		});
 
 		if (res.ok) {
-			router.push("/");
+			await new Promise((r) => setTimeout(r, 2000));
+			window.location.href = "/";
+		} else {
+			const data = await res.json();
+			setError(data.message ?? "Registration failed");
 		}
 	};
 
@@ -53,6 +56,8 @@ export default function Page() {
 					/>
 
 					<button>Register</button>
+
+					{error && <p>{error}</p>}
 				</form>
 			</Case>
 		</>
