@@ -1,11 +1,16 @@
 import styles from "./Case.module.css";
 
-const Case = ({
-	children,
-}: Readonly<{
+type CaseProps = {
 	children?: React.ReactNode;
-}>) => {
-	return <div className={styles.case}>{children}</div>;
+	className?: string;
+};
+
+const Case = ({ children, className }: CaseProps) => {
+	return (
+		<div className={[styles.case, className || ""].join(" ")}>
+			{children}
+		</div>
+	);
 };
 
 export default Case;

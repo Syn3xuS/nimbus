@@ -1,0 +1,65 @@
+/* CSS module using only CSS variables */
+
+.container {
+	background: var(--bg);
+	color: var(--text);
+	padding: 16px;
+	border-radius: 8px;
+	width: 80%;
+	min-height: 70vh;
+}
+.toolbar {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 12px;
+}
+.breadcrumb {
+	color: var(--muted);
+	font-size: 14px;
+}
+.list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.item {
+	display: flex;
+
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 10px;
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), transparent);
+	border-radius: 6px;
+	margin-bottom: 8px;
+}
+
+.item a {
+	display: inline;
+}
+.itemName {
+	color: var(--text);
+}
+.button {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	color: var(--accent);
+	padding: 6px 8px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+.input {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	color: var(--text);
+	padding: 6px 8px;
+	border-radius: 6px;
+}
+.folderIcon {
+	color: var(--accent);
+	margin-right: 8px;
+}
+.fileIcon {
+	color: var(--muted);
+	margin-right: 8px;
+}

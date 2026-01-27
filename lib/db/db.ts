@@ -35,6 +35,8 @@ function getPool() {
 	return pool;
 }
 
+export { getPool };
+
 export async function readDB(): Promise<DB> {
 	const db = getPool();
 	await initDb(db);

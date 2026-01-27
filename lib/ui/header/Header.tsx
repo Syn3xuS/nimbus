@@ -60,7 +60,7 @@ const Header = () => {
 			>
 				<Brand_banner></Brand_banner>
 
-				<Link href={`/disk/${username}`}>Мой диск</Link>
+				<Link href={`/disk/${username ? username : ""}`}>Мой диск</Link>
 
 				<div className="authButtons">
 					{loading ? null : username ? (

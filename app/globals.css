@@ -6,6 +6,11 @@
 	--backgroundTo: #f4f4f4;
 	--foreground: #171717;
 	--accent: #3abbec;
+
+	--bg: #0f172a;
+	--card: #0b1220;
+	--text: #e6eef8;
+	--muted: #9aa7bb;
 }
 
 @theme inline {
