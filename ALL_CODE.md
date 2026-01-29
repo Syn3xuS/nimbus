@@ -1,9 +1,11 @@
 # ALL_CODE.md
-Generated: 2026-01-27T16:34:59.765Z
+
+Generated: 2026-01-29T18:56:54.601Z
 
 ## app
 
 app/api/auth/login/route.ts
+
 ```ts
 import { NextRequest, NextResponse } from "next/server";
 import { loginUser } from "@/lib/services/auth/login";
@@ -42,10 +44,10 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
-
 ```
 
 app/api/auth/me/route.ts
+
 ```ts
 import { NextRequest, NextResponse } from "next/server";
 import { readDB } from "@/lib/db/db";
@@ -85,10 +87,10 @@ export async function GET(req: NextRequest) {
 		},
 	});
 }
-
 ```
 
 app/api/auth/register/route.ts
+
 ```ts
 import { NextRequest, NextResponse } from "next/server";
 import { registerUser } from "@/lib/services/auth/register";
@@ -112,10 +114,10 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
-
 ```
 
 app/api/files/[username]/route.ts
+
 ```ts
 import { NextRequest, NextResponse } from "next/server";
 import { getPool } from "@/lib/db/db";
@@ -137,7 +139,7 @@ export async function GET(
 	const db = getPool();
 	await initDb(db);
 
-		const token = req.cookies.get("auth_token")?.value;
+	const token = req.cookies.get("auth_token")?.value;
 	if (!token) {
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 	}
@@ -157,7 +159,7 @@ export async function GET(
 
 	const sessionUserId = sessRes.rows[0].user_id;
 
-		const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
+	const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
 		username,
 	]);
 	if (userRes.rowCount === 0)
@@ -169,7 +171,7 @@ export async function GET(
 	if (ownerId !== sessionUserId)
 		return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 
-		const downloadId = req.nextUrl.searchParams.get("downloadId");
+	const downloadId = req.nextUrl.searchParams.get("downloadId");
 	if (downloadId) {
 		const res = await db.query(
 			`SELECT f.object_key, f.filename, f.content_type FROM files f JOIN users u ON f.user_id = u.id WHERE f.id = $1 AND u.username = $2`,
@@ -185,7 +187,7 @@ export async function GET(
 		const contentType =
 			res.rows[0].content_type ?? "application/octet-stream";
 
-				const s3res = await getObjectStream(key);
+		const s3res = await getObjectStream(key);
 		const body = s3res.Body as unknown as BodyInit;
 		if (!body)
 			return NextResponse.json(
@@ -203,7 +205,7 @@ export async function GET(
 		return new Response(body, { status: 200, headers });
 	}
 
-		const files = await listFilesByUsername(username);
+	const files = await listFilesByUsername(username);
 	const withUrls = files.map((f) => ({
 		...f,
 		url: `/api/files/${username}?downloadId=${f.id}`,
@@ -232,7 +234,7 @@ export async function POST(
 		);
 	const userId = userRes.rows[0].id;
 
-		const token = req.cookies.get("auth_token")?.value;
+	const token = req.cookies.get("auth_token")?.value;
 	if (!token)
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
@@ -295,7 +297,7 @@ export async function POST(
 				{ message: "name required" },
 				{ status: 400 },
 			);
-				const parentPath = (path ?? "/").replace(/\/$/, "") + "/";
+		const parentPath = (path ?? "/").replace(/\/$/, "") + "/";
 		const file = await registerFile(userId, null, name, parentPath, true);
 		return NextResponse.json({ folder: file });
 	}
@@ -323,10 +325,10 @@ export async function POST(
 
 	return NextResponse.json({ message: "unknown action" }, { status: 400 });
 }
-
 ```
 
 app/api/users/[username]/route.ts
+
 ```ts
 import { NextRequest, NextResponse } from "next/server";
 import { readDB } from "@/lib/db/db";
@@ -336,7 +338,7 @@ export async function GET(
 	context: { params: Promise<{ username: string }> },
 ) {
 	const { params } = context;
-	const { username } = await params; 
+	const { username } = await params;
 	const db = await readDB();
 
 	const user = db.users.find((u) => u.username === username);
@@ -351,22 +353,26 @@ export async function GET(
 	return NextResponse.json({
 		user: {
 			username: user.username,
-			email: user.email, 			createdAt: user.createdAt,
+			email: user.email,
+			createdAt: user.createdAt,
 		},
 	});
 }
-
 ```
 
 app/auth/login/page.tsx
+
 ```tsx
 "use client";
 
 import { useState } from "react";
 import Case from "@/lib/ui/case/Case";
 
-export default function Page() {
+import styles from "@/lib/ui/case/Case_center.module.css";
 
+import "../styles.css";
+
+export default function Page() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -392,7 +398,7 @@ export default function Page() {
 
 	return (
 		<>
-			<Case>
+			<Case className={styles.case_center}>
 				<form onSubmit={onSubmit}>
 					<input
 						value={email}
@@ -407,23 +413,32 @@ export default function Page() {
 						placeholder="Password"
 					/>
 
-					<button>Login</button>
+					<button className="button2">Login</button>
 
-					{error && <p>{error}</p>}
+					<div className="prs">
+						У вас ещё нет аккаунт?{" "}
+						<a href="/auth/register">Зарегистрируйтесь</a>
+					</div>
+
+					{error && <div className="error">{error}</div>}
 				</form>
 			</Case>
 		</>
 	);
 }
-
 ```
 
 app/auth/register/page.tsx
+
 ```tsx
 "use client";
 
 import { useState } from "react";
 import Case from "@/lib/ui/case/Case";
+
+import styles from "@/lib/ui/case/Case_center.module.css";
+
+import "../styles.css";
 
 export default function Page() {
 	const [error, setError] = useState<string | null>(null);
@@ -456,7 +471,7 @@ export default function Page() {
 
 	return (
 		<>
-			<Case>
+			<Case className={styles.case_center}>
 				<form onSubmit={onSubmit}>
 					<input
 						value={email}
@@ -477,50 +492,118 @@ export default function Page() {
 						placeholder="Password"
 					/>
 
-					<button>Register</button>
+					<button className="button2">Register</button>
+					<div className="prs">
+						У вас уже есть аккаунт?{" "}
+						<a href="/auth/login">Войдите</a>
+					</div>
 
-					{error && <p>{error}</p>}
+					{error && <div className="error">{error}</div>}
 				</form>
 			</Case>
 		</>
 	);
 }
+```
 
+app/auth/styles.css
+
+```css
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 60px;
+	background: var(--bg);
+	border-radius: 12px;
+}
+
+input {
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	color: var(--text);
+	padding: 10px 12px;
+	border-radius: 8px;
+	font-size: 16px;
+}
+
+.button2 {
+	background: var(--accent);
+	color: var(--button-text);
+	padding: 10px 12px;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	cursor: pointer;
+	margin-top: 8px;
+}
+
+.error {
+	color: red;
+	margin-top: 8px;
+}
+
+.prs {
+	color: var(--muted);
+	margin-top: 12px;
+	& a {
+		color: var(--accent);
+		text-decoration: none;
+		margin-left: 4px;
+	}
+}
 ```
 
 app/disk/page.tsx
+
 ```tsx
 import Case from "@/lib/ui/case/Case";
 
+import Case_center from "@/lib/ui/case/Case_center.module.css";
+import Link from "next/link";
 export default function page() {
 	return (
 		<>
-			<Case>
-				Страница - файловый менеджер, задумано что человек здесь смотрит
-				всё то что ему доступно на его диске и дисках которые ему
-				доступны
+			<Case className={Case_center.case_center}>
+				<div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+					<h1 className="text-2xl font-semibold">
+						Ваш диск ждёт вас ☁️
+					</h1>
+
+					<p className="max-w-md text-muted-foreground">
+						Войдите в аккаунт, чтобы получить доступ к вашим файлам
+						и дискам, которыми с вами поделились другие
+						пользователи.
+					</p>
+
+					<div className="flex gap-3 ">
+						<Link
+							href="/auth/login"
+							className="px-5 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90"
+						>
+							Войти
+						</Link>
+						<Link
+							href="/auth/register"
+							className="px-5 py-2 rounded-lg border hover:bg-muted"
+						>
+							Создать аккаунт
+						</Link>
+					</div>
+
+					<p className="mt-6 text-sm text-muted-foreground">
+						После входа здесь появится ваш файловый менеджер
+					</p>
+				</div>
 			</Case>
 		</>
 	);
 }
-
-```
-
-app/disk/[username]/Case.module.css
-```css
-.case_center {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
 ```
 
 app/disk/[username]/DiskClient.module.css
+
 ```css
-
-
 .container {
 	background: var(--bg);
 	color: var(--text);
@@ -584,10 +667,10 @@ app/disk/[username]/DiskClient.module.css
 	color: var(--muted);
 	margin-right: 8px;
 }
-
 ```
 
 app/disk/[username]/DiskClient.tsx
+
 ```tsx
 "use client";
 import React, { useEffect, useState } from "react";
@@ -627,7 +710,7 @@ const DiskClient = ({ username }: { username: string }) => {
 
 	useEffect(() => {
 		load();
-			}, [username]);
+	}, [username]);
 
 	const folders = items.filter(
 		(i) => i.isFolder && (i.path ?? "/") === currentPath,
@@ -813,10 +896,10 @@ const DiskClient = ({ username }: { username: string }) => {
 };
 
 export default DiskClient;
-
 ```
 
 app/disk/[username]/page.tsx
+
 ```tsx
 import Case from "@/lib/ui/case/Case";
 import DiskClient from "./DiskClient";
@@ -824,7 +907,7 @@ import { cookies } from "next/headers";
 import { getPool } from "@/lib/db/db";
 import { initDb } from "@/lib/db/init";
 
-import styles_case from "./Case.module.css"
+import styles_case from "@/lib/ui/case/Case_center.module.css";
 
 export default async function page({
 	params,
@@ -901,13 +984,12 @@ export default async function page({
 		</>
 	);
 }
-
 ```
 
 app/globals.css
+
 ```css
 @import "tailwindcss";
-
 
 :root {
 	--background: #fbfbfb;
@@ -928,7 +1010,6 @@ app/globals.css
 	--font-sans: var(--font-geist-sans);
 	--font-mono: var(--font-geist-mono);
 }
-
 
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -952,6 +1033,19 @@ body {
 	height: 100%;
 }
 
+.page_background {
+	position: fixed;
+	top: 0;
+	z-index: -100;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		to right bottom,
+		lab(8.11897 0.811279 -12.254) 0%,
+		rgb(0, 0, 0) 100%
+	);
+}
+
 .link {
 	color: var(--accent);
 }
@@ -966,10 +1060,10 @@ a {
 	display: flex;
 	gap: 0.75rem;
 }
-
 ```
 
 app/layout.tsx
+
 ```tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -1000,55 +1094,213 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="ru">
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<Header />
-				<Main>{children}</Main>
-				<Footer />
-			</body>
-		</html>
+		<>
+			<div className="page_background"></div>
+
+			<html lang="ru">
+				<body
+					className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+				>
+					<Header />
+					<Main>{children}</Main>
+					<Footer />
+				</body>
+			</html>
+		</>
 	);
 }
+```
 
+app/page.module.css
+
+```css
+.hero {
+	background: linear-gradient(
+		180deg,
+		rgba(79, 70, 229, 0.06),
+		transparent 60%
+	);
+	padding: 48px 24px;
+	border-radius: 12px;
+	box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+}
+
+.heroInner {
+	display: flex;
+	gap: 28px;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+}
+
+.heroText {
+	max-width: 640px;
+}
+
+.title {
+	font-size: 28px;
+	margin: 0 0 8px 0;
+	color: #edf3ff;
+}
+
+.subtitle {
+	margin: 0;
+	color: var(--muted);
+	line-height: 1.5;
+}
+
+.actions {
+	display: flex;
+	gap: 12px;
+	margin-top: 16px;
+}
+
+.features {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 12px;
+	margin-top: 18px;
+}
+
+.featureCard {
+	background: #40404040;
+	padding: 14px;
+	border-radius: 10px;
+	box-shadow: 0 4px 14px rgba(2, 6, 23, 0.04);
+}
+
+.imagesGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.img {
+	width: 100%;
+	height: 160px;
+	object-fit: cover;
+	border-radius: 8px;
+	display: block;
+}
+
+.section {
+	margin-top: 20px;
+}
+
+.muted {
+	color: var(--muted);
+}
 ```
 
 app/page.tsx
+
 ```tsx
-import Case from "@/lib/ui/case/Case";
-import Link from "next/link";
+"use client";
+
+import styles from "./page.module.css";
+
+import Image from "next/image";
+
+import img1 from "@/public/image1.png";
 
 export default function page() {
 	return (
 		<>
-			<Case>
-				<p>Главная страница</p>
-				<div>
-					<p>
-						<Link className="link" href={"/auth/login"}>
-							Вход
-						</Link>
+			<div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
+				<section>
+					<div className={styles.hero}>
+						<div className={styles.heroInner}>
+							<div className={styles.heroText}>
+								<h1 className={styles.title}>
+									Nimbus — личное облачное хранилище
+								</h1>
+								<p className={styles.subtitle}>
+									Безопасное и простое хранилище для ваших
+									файлов. Быстрая загрузка, приватность и
+									прозрачная интеграция с S3‑совместимыми
+									хранилищами.
+								</p>
+							</div>
+
+							<div style={{ minWidth: 260 }}>
+								<Image
+									src={img1}
+									alt="Cloud"
+									style={{
+										width: 320,
+										height: 200,
+										objectFit: "cover",
+										borderRadius: 10,
+									}}
+								/>
+							</div>
+						</div>
+
+						<div className={styles.features}>
+							<div className={styles.featureCard}>
+								<strong>Надёжность</strong>
+								<p className={styles.muted}>
+									PostgreSQL для метаданных, проверенные
+									алгоритмы хеширования.
+								</p>
+							</div>
+							<div className={styles.featureCard}>
+								<strong>Масштабируемость</strong>
+								<p className={styles.muted}>
+									Интеграция с AWS S3 и S3‑совместимыми
+									решениями.
+								</p>
+							</div>
+							<div className={styles.featureCard}>
+								<strong>Безопасность</strong>
+								<p className={styles.muted}>
+									argon2 / bcryptjs для защиты паролей и
+									сессий.
+								</p>
+							</div>
+						</div>
+
+						<div className={styles.features}>
+							<div className={styles.featureCard}>
+								<strong>Простота использования</strong>
+								<p className={styles.muted}>
+									Интуитивный интерфейс и быстрый доступ к
+									файлам.
+								</p>
+							</div>
+							<div className={styles.featureCard}>
+								<strong>Интеграции</strong>
+								<p className={styles.muted}>
+									Поддержка внешних сервисов и API для
+									автоматизации.
+								</p>
+							</div>
+						</div>
+					</div>
+				</section>
+				<section className={styles.section}>
+					<h2 style={{ marginTop: 0 }}>Готово к использованию</h2>
+					<p className={styles.muted}>
+						Зарегистрируйтесь, чтобы протестировать загрузку и
+						управление файлами. Система использует PostgreSQL для
+						пользователей и сессий, а для файлов — S3.
 					</p>
-					<p>
-						<Link className="link" href={"/auth/register"}>
-							Регистрация
-						</Link>
-					</p>
-				</div>
-			</Case>
+				</section>
+			</div>
 		</>
 	);
 }
-
 ```
 
 app/profile/[username]/page.tsx
+
 ```tsx
 import Case from "@/lib/ui/case/Case";
 
 type Props = {
-	params: Promise<{ username: string }>; };
+	params: Promise<{ username: string }>;
+};
 
 async function getUser(username: string) {
 	const res = await fetch(`http://localhost:3000/api/users/${username}`, {
@@ -1060,30 +1312,30 @@ async function getUser(username: string) {
 }
 
 export default async function page({ params }: Props) {
-	const { username } = await params; 
-	const data = await getUser(username); 
+	const { username } = await params;
+	const data = await getUser(username);
 	if (!data) {
 		return <h1>User not found</h1>;
 	}
 
 	return (
 		<>
-		<Case>
-			<div>
-				<h1>{data.user.username}</h1>
-				<p>Email: {data.user.email}</p>
-				<p>Joined: {data.user.createdAt}</p>
-			</div>
-		</Case>
+			<Case>
+				<div>
+					<h1>{data.user.username}</h1>
+					<p>Email: {data.user.email}</p>
+					<p>Joined: {data.user.createdAt}</p>
+				</div>
+			</Case>
 		</>
 	);
 }
-
 ```
 
 ## lib
 
 lib/db/db.ts
+
 ```ts
 import { Pool } from "pg";
 import { initDb } from "./init";
@@ -1115,7 +1367,8 @@ function getPool() {
 			user: "dev",
 			password: "dev",
 			host: "localhost",
-			port: 5432, 			database: "app",
+			port: 5432,
+			database: "app",
 		});
 	}
 	return pool;
@@ -1156,10 +1409,10 @@ export async function writeDB(data: DB) {
 	try {
 		await client.query("BEGIN");
 
-				await client.query("TRUNCATE users, sessions RESTART IDENTITY CASCADE");
+		await client.query("TRUNCATE users, sessions RESTART IDENTITY CASCADE");
 
-				for (const user of data.users) {
-						const passwordHash = user.passwordHash ?? "temp_hash";
+		for (const user of data.users) {
+			const passwordHash = user.passwordHash ?? "temp_hash";
 			const createdAt = user.createdAt ?? new Date().toISOString();
 
 			await client.query(
@@ -1171,7 +1424,7 @@ export async function writeDB(data: DB) {
 			);
 		}
 
-				for (const session of data.sessions) {
+		for (const session of data.sessions) {
 			const createdAt = session.createdAt ?? new Date().toISOString();
 
 			await client.query(
@@ -1191,10 +1444,10 @@ export async function writeDB(data: DB) {
 		client.release();
 	}
 }
-
 ```
 
 lib/db/init.ts
+
 ```ts
 import { Pool } from "pg";
 
@@ -1203,7 +1456,7 @@ let initialized = false;
 export async function initDb(pool: Pool) {
 	if (initialized) return;
 
-		await pool.query(`
+	await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
@@ -1231,30 +1484,30 @@ export async function initDb(pool: Pool) {
       );
   `);
 
-		await pool.query(`
+	await pool.query(`
     ALTER TABLE files ADD COLUMN IF NOT EXISTS path TEXT NOT NULL DEFAULT '/';
     ALTER TABLE files ADD COLUMN IF NOT EXISTS is_folder BOOLEAN NOT NULL DEFAULT FALSE;
     -- allow object_key to be NULL for folder entries
     ALTER TABLE files ALTER COLUMN object_key DROP NOT NULL;
     `);
 
-				try {
+	try {
 		await pool.query(`
       UPDATE files
       SET path = regexp_replace(path, '/' || filename || '/$', '/', '')
       WHERE is_folder = TRUE AND path ~ ('/' || filename || '/$');
     `);
 	} catch (e) {
-				console.warn("files: folder-normalize migration failed", e);
+		console.warn("files: folder-normalize migration failed", e);
 	}
 
 	initialized = true;
 	console.log("🐘 Postgres (Docker) initialized");
 }
-
 ```
 
 lib/services/auth/login.ts
+
 ```ts
 import argon2 from "argon2";
 import { readDB } from "@/lib/db/db";
@@ -1281,10 +1534,10 @@ export async function loginUser(input: { email: string; password: string }) {
 
 	return user;
 }
-
 ```
 
 lib/services/auth/register.ts
+
 ```ts
 import argon2 from "argon2";
 import { readDB, writeDB } from "@/lib/db/db";
@@ -1325,10 +1578,10 @@ export async function registerUser(input: {
 
 	return user;
 }
-
 ```
 
 lib/services/files/files.ts
+
 ```ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -1368,14 +1621,14 @@ async function ensureBucketExists() {
 	try {
 		await s3.send(new CreateBucketCommand({ Bucket: MINIO_BUCKET }));
 	} catch (err: any) {
-				const code = err?.Code ?? err?.code ?? err?.name;
+		const code = err?.Code ?? err?.code ?? err?.name;
 		const msg = String(err?.message ?? "");
 		const isAlreadyOwned =
 			code === "BucketAlreadyOwnedByYou" ||
 			code === "BucketAlreadyExists" ||
 			/BucketAlreadyOwnedByYou|BucketAlreadyExists/.test(msg);
 		if (!isAlreadyOwned) {
-						throw err;
+			throw err;
 		}
 	}
 }
@@ -1472,7 +1725,7 @@ export async function listFilesByUsername(username: string) {
 export async function deleteFile(userId: string, id: string) {
 	const db = getPool();
 	await initDb(db);
-		const metaRes = await db.query(
+	const metaRes = await db.query(
 		`SELECT id, filename, path, is_folder, object_key FROM files WHERE id = $1 AND user_id = $2`,
 		[id, userId],
 	);
@@ -1482,7 +1735,7 @@ export async function deleteFile(userId: string, id: string) {
 	const meta = metaRes.rows[0] as any;
 
 	if (!meta.is_folder) {
-				const key = meta.object_key as string | null;
+		const key = meta.object_key as string | null;
 		if (key) {
 			await ensureBucketExists();
 			await s3.send(
@@ -1493,10 +1746,10 @@ export async function deleteFile(userId: string, id: string) {
 		return true;
 	}
 
-		const folderFullPath =
+	const folderFullPath =
 		(meta.path ?? "/").replace(/\/$/, "") + "/" + meta.filename + "/";
 
-		const childrenRes = await db.query(
+	const childrenRes = await db.query(
 		`SELECT id, object_key FROM files WHERE path = $1 OR path LIKE $1 || '%'`,
 		[folderFullPath],
 	);
@@ -1504,9 +1757,9 @@ export async function deleteFile(userId: string, id: string) {
 	const toDelete: { id: string; key: string | null }[] = childrenRes.rows.map(
 		(r: any) => ({ id: r.id, key: r.object_key ?? null }),
 	);
-		toDelete.push({ id: meta.id, key: meta.object_key ?? null });
+	toDelete.push({ id: meta.id, key: meta.object_key ?? null });
 
-		const keys = toDelete.map((t) => t.key).filter(Boolean) as string[];
+	const keys = toDelete.map((t) => t.key).filter(Boolean) as string[];
 	if (keys.length > 0) {
 		await ensureBucketExists();
 		for (const k of keys) {
@@ -1520,7 +1773,7 @@ export async function deleteFile(userId: string, id: string) {
 		}
 	}
 
-		try {
+	try {
 		await db.query("BEGIN");
 		for (const item of toDelete) {
 			await db.query(`DELETE FROM files WHERE id = $1`, [item.id]);
@@ -1533,10 +1786,10 @@ export async function deleteFile(userId: string, id: string) {
 
 	return true;
 }
-
 ```
 
 lib/ui/Buttons/button/button.module.css
+
 ```css
 .button {
 	padding: 6px 14px;
@@ -1552,10 +1805,10 @@ lib/ui/Buttons/button/button.module.css
 	background: var(--accent);
 	color: var(--background);
 }
-
 ```
 
 lib/ui/Buttons/button/button.tsx
+
 ```tsx
 import styles from "./button.module.css";
 const Button = ({
@@ -1567,18 +1820,17 @@ const Button = ({
 };
 
 export default Button;
-
 ```
 
 lib/ui/Buttons/Buttons.tsx
+
 ```tsx
 export { default as Button } from "./button/button";
 export { default as Button_fill } from "./button_fill/button_fill";
-
-
 ```
 
 lib/ui/Buttons/button_fill/button_fill.module.css
+
 ```css
 .button_fill {
 	background: var(--accent);
@@ -1588,10 +1840,10 @@ lib/ui/Buttons/button_fill/button_fill.module.css
 .button_fill:hover {
 	opacity: 0.85;
 }
-
 ```
 
 lib/ui/Buttons/button_fill/button_fill.tsx
+
 ```tsx
 import main_styles from "@/lib/ui/Buttons/button/button.module.css";
 import styles from "./button_fill.module.css";
@@ -1601,23 +1853,27 @@ const Button_fill = ({
 }: Readonly<{
 	children?: React.ReactNode;
 }>) => {
-	return <button className={main_styles.button + " " + styles.button_fill}>{children}</button>;
+	return (
+		<button className={main_styles.button + " " + styles.button_fill}>
+			{children}
+		</button>
+	);
 };
 
 export default Button_fill;
-
 ```
 
 lib/ui/case/Case.module.css
+
 ```css
 .case {
 	width: 100%;
 	min-height: calc(100vh - 50px);
 }
-
 ```
 
 lib/ui/case/Case.tsx
+
 ```tsx
 import styles from "./Case.module.css";
 
@@ -1635,32 +1891,74 @@ const Case = ({ children, className }: CaseProps) => {
 };
 
 export default Case;
+```
 
+lib/ui/case/Case_center.module.css
+
+```css
+.case_center {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
 ```
 
 lib/ui/footer/Footer.module.css
+
 ```css
 .footer {
-	background: var(--backgroundTo);
+	/* хочу  полу прозрачный градиент */
+	background: linear-gradient(to bottom, #00000000, #000000);
 	width: 100%;
-	min-height: 50vh;
+	padding: 70px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
 }
 
+.footer h2 {
+	color: var(--foreground);
+	font-size: 18px;
+	margin-bottom: 10px;
+}
 ```
 
 lib/ui/footer/Footer.tsx
+
 ```tsx
+import { Button } from "@/lib/ui/Buttons/Buttons";
 import styles from "./Footer.module.css";
 
 const Footer = () => {
-	return <footer className={styles.footer}></footer>;
+	return (
+		<footer
+			className={
+				styles.footer +
+				" " +
+				"mt-8 pt-6 border-t border-gray-800 text-center text-gray-500 text-sm"
+			}
+		>
+			<p>Nimbus Cloud Storage • v0.1.1beta • © 2026 Все права защищены</p>
+			<h2>Разработчики:</h2>
+			<div
+				className="authButtons"
+				style={{ width: "fit-content", margin: "0 auto" }}
+			>
+				<Button>Ибрагимов Айаз</Button>
+				<Button>Верхорубов Владислав</Button>
+				<Button>Хапаева Виктория</Button>
+			</div>
+		</footer>
+	);
 };
 
 export default Footer;
-
 ```
 
 lib/ui/header/brand_banner/Brand_banner.module.css
+
 ```css
 .brand_banner {
 	height: 42px;
@@ -1683,10 +1981,10 @@ lib/ui/header/brand_banner/Brand_banner.module.css
 	font-weight: 600;
 	color: var(--text);
 }
-
 ```
 
 lib/ui/header/brand_banner/Brand_banner.tsx
+
 ```tsx
 import styles from "./Brand_banner.module.css";
 
@@ -1712,10 +2010,10 @@ const Brand_banner = () => {
 	);
 };
 export default Brand_banner;
-
 ```
 
 lib/ui/header/Header.module.css
+
 ```css
 .header {
 	position: sticky;
@@ -1743,10 +2041,10 @@ lib/ui/header/Header.module.css
 .hide {
 	transform: translateY(-100%);
 }
-
 ```
 
 lib/ui/header/Header.tsx
+
 ```tsx
 "use client";
 
@@ -1840,10 +2138,10 @@ const Header = () => {
 };
 
 export default Header;
-
 ```
 
 lib/ui/header/user_card/User_card.module.css
+
 ```css
 .user_card {
 	display: block;
@@ -1860,7 +2158,7 @@ lib/ui/header/user_card/User_card.module.css
 		-moz-transform: scale(1.05);
 		-ms-transform: scale(1.05);
 		-o-transform: scale(1.05);
-}
+	}
 }
 
 .user_card div {
@@ -1874,10 +2172,10 @@ lib/ui/header/user_card/User_card.module.css
 	border-radius: 50%;
 	object-fit: cover;
 }
-
 ```
 
 lib/ui/header/user_card/User_card.tsx
+
 ```tsx
 import styles from "./User_card.module.css";
 
@@ -1911,18 +2209,19 @@ const User_card = ({
 };
 
 export default User_card;
-
 ```
 
 lib/ui/main/Main.module.css
+
 ```css
-.content {
+.main {
 	width: 100%;
 	min-height: calc(100vh - 50px);
 }
 ```
 
 lib/ui/main/Main.tsx
+
 ```tsx
 import styles from "./Main.module.css";
 
@@ -1931,10 +2230,46 @@ const Main = ({
 }: Readonly<{
 	children: React.ReactNode;
 }>) => {
-	return <main className={styles.content}>{children}</main>;
+	return <main className={styles.main}>{children}</main>;
 };
 
 export default Main;
-
 ```
 
+docker-compose.yml
+
+```
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - minio_data:/data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    command: server /data --console-address ":9001"
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: nimbus_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+
+volumes:
+  minio_data:
+  pgdata:
+
+```
