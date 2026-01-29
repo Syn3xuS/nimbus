@@ -85,7 +85,22 @@ async function main() {
 		await fs.writeFile(OUT_FILE, header, "utf8");
 		const handle = await fs.open(OUT_FILE, "a");
 		const stream = handle.createWriteStream({ encoding: "utf8" });
-		await walk(process.cwd(), stream);
+
+		// only collect from these roots
+		const roots = ["app", "lib"];
+		for (const r of roots) {
+			const rootPath = path.join(process.cwd(), r);
+			try {
+				const st = await fs.stat(rootPath);
+				if (st.isDirectory()) {
+					await stream.write(`## ${r}\n\n`);
+					await walk(rootPath, stream);
+				}
+			} catch (e) {
+				// ignore missing directories
+			}
+		}
+
 		stream.end();
 		await handle.close();
 		console.log("Wrote", OUT_FILE);
