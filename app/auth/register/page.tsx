@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Case from "@/lib/ui/case/Case";
 
+import styles from "@/lib/ui/case/Case_center.module.css";
+
+import "../styles.css";
+
 export default function Page() {
 	const [error, setError] = useState<string | null>(null);
 
@@ -34,7 +38,7 @@ export default function Page() {
 
 	return (
 		<>
-			<Case>
+			<Case className={styles.case_center}>
 				<form onSubmit={onSubmit}>
 					<input
 						value={email}
@@ -55,9 +59,13 @@ export default function Page() {
 						placeholder="Password"
 					/>
 
-					<button>Register</button>
+					<button className="button2">Register</button>
+					<div className="prs">
+						У вас уже есть аккаунт?{" "}
+						<a href="/auth/login">Войдите</a>
+					</div>
 
-					{error && <p>{error}</p>}
+					{error && <div className="error">{error}</div>}
 				</form>
 			</Case>
 		</>

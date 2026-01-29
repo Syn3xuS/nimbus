@@ -5,7 +5,7 @@ const Main = ({
 }: Readonly<{
 	children: React.ReactNode;
 }>) => {
-	return <main className={styles.content}>{children}</main>;
+	return <main className={styles.main}>{children}</main>;
 };
 
 export default Main;

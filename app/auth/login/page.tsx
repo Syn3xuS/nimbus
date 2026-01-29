@@ -3,8 +3,11 @@
 import { useState } from "react";
 import Case from "@/lib/ui/case/Case";
 
-export default function Page() {
+import styles from "@/lib/ui/case/Case_center.module.css";
 
+import "../styles.css";
+
+export default function Page() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -30,7 +33,7 @@ export default function Page() {
 
 	return (
 		<>
-			<Case>
+			<Case className={styles.case_center}>
 				<form onSubmit={onSubmit}>
 					<input
 						value={email}
@@ -45,9 +48,14 @@ export default function Page() {
 						placeholder="Password"
 					/>
 
-					<button>Login</button>
+					<button className="button2">Login</button>
 
-					{error && <p>{error}</p>}
+					<div className="prs">
+						У вас ещё нет аккаунт?{" "}
+						<a href="/auth/register">Зарегистрируйтесь</a>
+					</div>
+
+					{error && <div className="error">{error}</div>}
 				</form>
 			</Case>
 		</>

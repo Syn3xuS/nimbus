@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { getPool } from "@/lib/db/db";
 import { initDb } from "@/lib/db/init";
 
-import styles_case from "./Case.module.css"
+import styles_case from "@/lib/ui/case/Case_center.module.css";
 
 export default async function page({
 	params,
