@@ -9,7 +9,7 @@ import img1 from "@/public/image1.png";
 export default function page() {
 	return (
 		<>
-			<div style={{ padding: 24, maxWidth: 1100, margin: "0 auto" }}>
+			<div className={styles.page}>
 				<section>
 					<div className={styles.hero}>
 						<div className={styles.heroInner}>
@@ -25,16 +25,11 @@ export default function page() {
 								</p>
 							</div>
 
-							<div style={{ minWidth: 260 }}>
+							<div className={styles.heroImageWrapper}>
 								<Image
 									src={img1}
 									alt="Cloud"
-									style={{
-										width: 320,
-										height: 200,
-										objectFit: "cover",
-										borderRadius: 10,
-									}}
+									className={styles.heroImage}
 								/>
 							</div>
 						</div>
@@ -82,7 +77,7 @@ export default function page() {
 					</div>
 				</section>
 				<section className={styles.section}>
-					<h2 style={{ marginTop: 0 }}>Готово к использованию</h2>
+					<h2 className={styles.sectionTitle}>Готово к использованию</h2>
 					<p className={styles.muted}>
 						Зарегистрируйтесь, чтобы протестировать загрузку и
 						управление файлами. Система использует PostgreSQL для

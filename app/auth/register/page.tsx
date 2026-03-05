@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Case from "@/lib/ui/case/Case";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Case from "@/shared/ui/case/Case";
 
-import styles from "@/lib/ui/case/Case_center.module.css";
+import styles from "@/shared/ui/case/Case_center.module.css";
 
 import "../styles.css";
 
@@ -14,25 +16,31 @@ export default function Page() {
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 
+	const router = useRouter();
+
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		const res = await fetch("/api/auth/register", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				email,
-				username,
-				password,
-			}),
-		});
+		try {
+			const res = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email,
+					username,
+					password,
+				}),
+			});
 
-		if (res.ok) {
-			await new Promise((r) => setTimeout(r, 2000));
-			window.location.href = "/";
-		} else {
-			const data = await res.json();
-			setError(data.message ?? "Registration failed");
+			if (res.ok) {
+				await new Promise((r) => setTimeout(r, 2000));
+				router.push("/");
+			} else {
+				const data = await res.json();
+				setError(data.message ?? "Registration failed");
+			}
+		} catch {
+			setError("Произошла ошибка сервера. Попробуйте ещё раз позже.");
 		}
 	};
 
@@ -62,7 +70,7 @@ export default function Page() {
 					<button className="button2">Register</button>
 					<div className="prs">
 						У вас уже есть аккаунт?{" "}
-						<a href="/auth/login">Войдите</a>
+						<Link href="/auth/login">Войдите</Link>
 					</div>
 
 					{error && <div className="error">{error}</div>}

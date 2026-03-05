@@ -1,10 +1,21 @@
-import Case from "@/lib/ui/case/Case";
+import Case from "@/shared/ui/case/Case";
 import DiskClient from "./DiskClient";
 import { cookies } from "next/headers";
-import { getPool } from "@/lib/db/db";
-import { initDb } from "@/lib/db/init";
+import { getPool } from "@/server/db/db";
+import { initDb } from "@/server/db/init";
+import caseStyles from "@/shared/ui/case/Case_center.module.css";
+import { getValidSessionUserId } from "@/server/auth/session";
 
-import styles_case from "@/lib/ui/case/Case_center.module.css";
+function AccessDenied({ children }: { children: React.ReactNode }) {
+	return (
+		<>
+			<Case>
+				<h1>Доступ к диску закрыт</h1>
+				<p>{children}</p>
+			</Case>
+		</>
+	);
+}
 
 export default async function page({
 	params,
@@ -18,63 +29,38 @@ export default async function page({
 
 	if (!token) {
 		return (
-			<>
-				<Case>
-					<h1>Доступ к диску закрыт</h1>
-					<p>Вы не имеете доступа к этому диску.</p>
-				</Case>
-			</>
+			<AccessDenied>Вы не имеете доступа к этому диску.</AccessDenied>
 		);
 	}
 
 	const db = getPool();
 	await initDb(db);
 
-	const sess = await db.query(
-		"SELECT user_id FROM sessions WHERE token = $1",
-		[token],
-	);
-	if (sess.rowCount === 0) {
+	const sessionUserId = await getValidSessionUserId(db, token);
+	if (!sessionUserId) {
 		return (
-			<>
-				<Case>
-					<h1>Доступ к диску закрыт</h1>
-					<p>Вы не имеете доступа к этому диску.</p>
-				</Case>
-			</>
+			<AccessDenied>Вы не имеете доступа к этому диску.</AccessDenied>
 		);
 	}
-
-	const sessionUserId = sess.rows[0].user_id as string;
 	const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
 		username,
 	]);
 	if (userRes.rowCount === 0) {
 		return (
-			<>
-				<Case>
-					<h1>Доступ к диску закрыт</h1>
-					<p>Пользователь не найден.</p>
-				</Case>
-			</>
+			<AccessDenied>Пользователь не найден.</AccessDenied>
 		);
 	}
 
 	const ownerId = userRes.rows[0].id as string;
 	if (ownerId !== sessionUserId) {
 		return (
-			<>
-				<Case>
-					<h1>Доступ к диску закрыт</h1>
-					<p>Вы не имеете доступа к этому диску.</p>
-				</Case>
-			</>
+			<AccessDenied>Вы не имеете доступа к этому диску.</AccessDenied>
 		);
 	}
 
 	return (
 		<>
-			<Case className={styles_case.case_center}>
+			<Case className={caseStyles.case_center}>
 				<h1>Диск пользователя: {username}</h1>
 				<DiskClient username={username} />
 			</Case>

@@ -1,11 +1,10 @@
-import Case from "@/lib/ui/case/Case";
-
-import Case_center from "@/lib/ui/case/Case_center.module.css";
+import Case from "@/shared/ui/case/Case";
+import caseStyles from "@/shared/ui/case/Case_center.module.css";
 import Link from "next/link";
 export default function page() {
 	return (
 		<>
-			<Case className={Case_center.case_center}>
+			<Case className={caseStyles.case_center}>
 				<div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
 					<h1 className="text-2xl font-semibold">
 						Ваш диск ждёт вас ☁️

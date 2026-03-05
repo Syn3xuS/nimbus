@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readDB } from "@/lib/db/db";
+import { readDB } from "@/server/db/db";
+
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function GET(req: NextRequest) {
 	const token = req.cookies.get("auth_token")?.value;
@@ -8,8 +10,13 @@ export async function GET(req: NextRequest) {
 	}
 
 	const db = await readDB();
+	const now = Date.now();
 
-	const session = db.sessions.find((s) => s.token === token);
+	const session = db.sessions.find(
+		(s) =>
+			s.token === token &&
+			new Date(s.createdAt).getTime() > now - SESSION_TTL_MS,
+	);
 	if (!session) {
 		const res = NextResponse.json({ user: null }, { status: 401 });
 		res.cookies.set("auth_token", "", {

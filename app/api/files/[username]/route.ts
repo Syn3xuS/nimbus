@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPool } from "@/lib/db/db";
-import { initDb } from "@/lib/db/init";
+import { getPool } from "@/server/db/db";
+import { initDb } from "@/server/db/init";
 import {
 	getPresignedUploadUrl,
 	registerFile,
 	listFilesByUsername,
 	getObjectStream,
-} from "@/lib/services/files/files";
+} from "@/server/files/files";
+import { getValidSessionUserId } from "@/server/auth/session";
 
 export async function GET(
 	req: NextRequest,
@@ -18,16 +19,13 @@ export async function GET(
 	const db = getPool();
 	await initDb(db);
 
-		const token = req.cookies.get("auth_token")?.value;
+	const token = req.cookies.get("auth_token")?.value;
 	if (!token) {
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 	}
 
-	const sessRes = await db.query(
-		"SELECT user_id FROM sessions WHERE token = $1",
-		[token],
-	);
-	if (sessRes.rowCount === 0) {
+	const sessionUserId = await getValidSessionUserId(db, token);
+	if (!sessionUserId) {
 		const res = NextResponse.json(
 			{ message: "Unauthorized" },
 			{ status: 401 },
@@ -35,8 +33,6 @@ export async function GET(
 		res.cookies.set("auth_token", "", { path: "/", maxAge: 0 });
 		return res;
 	}
-
-	const sessionUserId = sessRes.rows[0].user_id;
 
 		const userRes = await db.query("SELECT id FROM users WHERE username = $1", [
 		username,
@@ -113,15 +109,12 @@ export async function POST(
 		);
 	const userId = userRes.rows[0].id;
 
-		const token = req.cookies.get("auth_token")?.value;
+	const token = req.cookies.get("auth_token")?.value;
 	if (!token)
 		return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-	const sessRes = await db.query(
-		"SELECT user_id FROM sessions WHERE token = $1",
-		[token],
-	);
-	if (sessRes.rowCount === 0) {
+	const sessionUserId = await getValidSessionUserId(db, token);
+	if (!sessionUserId) {
 		const res = NextResponse.json(
 			{ message: "Unauthorized" },
 			{ status: 401 },
@@ -129,8 +122,6 @@ export async function POST(
 		res.cookies.set("auth_token", "", { path: "/", maxAge: 0 });
 		return res;
 	}
-
-	const sessionUserId = sessRes.rows[0].user_id;
 	if (sessionUserId !== userId)
 		return NextResponse.json({ message: "Forbidden" }, { status: 403 });
 

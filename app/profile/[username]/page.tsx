@@ -1,4 +1,4 @@
-import Case from "@/lib/ui/case/Case";
+import Case from "@/shared/ui/case/Case";
 
 type Props = {
 	params: Promise<{ username: string }>; };

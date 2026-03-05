@@ -1,0 +1,25 @@
+@import url("/app/globals.css");
+
+.brand_banner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.brand_banner_Link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+
+.brand_banner_Logo {
+	width: 35px;
+	height: 35px;
+}
+
+.brand_banner_Text {
+	font-size: 18px;
+	font-weight: 600;
+}
+

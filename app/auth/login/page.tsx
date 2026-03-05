@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Case from "@/lib/ui/case/Case";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Case from "@/shared/ui/case/Case";
 
-import styles from "@/lib/ui/case/Case_center.module.css";
+import styles from "@/shared/ui/case/Case_center.module.css";
 
 import "../styles.css";
 
@@ -12,23 +14,29 @@ export default function Page() {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 
+	const router = useRouter();
+
 	const onSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError(null);
 
-		const res = await fetch("/api/auth/login", {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ email, password }),
-		});
+		try {
+			const res = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, password }),
+			});
 
-		if (!res.ok) {
-			const data = await res.json();
-			setError(data.message ?? "Login failed");
-			return;
+			if (!res.ok) {
+				const data = await res.json();
+				setError(data.message ?? "Login failed");
+				return;
+			}
+
+			router.push("/");
+		} catch {
+			setError("Произошла ошибка сервера. Попробуйте ещё раз позже.");
 		}
-
-		window.location.href = "/";
 	};
 
 	return (
@@ -52,7 +60,7 @@ export default function Page() {
 
 					<div className="prs">
 						У вас ещё нет аккаунт?{" "}
-						<a href="/auth/register">Зарегистрируйтесь</a>
+						<Link href="/auth/register">Зарегистрируйтесь</Link>
 					</div>
 
 					{error && <div className="error">{error}</div>}
