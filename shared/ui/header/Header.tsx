@@ -9,85 +9,76 @@ import User_card from "@/shared/ui/header/user_card/User_card";
 import Brand_banner from "./brand_banner/Brand_banner";
 
 const Header = () => {
-	const [visible, setVisible] = useState(true);
-	const [lastScrollY, setLastScrollY] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
-	useEffect(() => {
-		const onScroll = () => {
-			const currentScrollY = window.scrollY;
+  useEffect(() => {
+    const onScroll = () => {
+      const currentScrollY = window.scrollY;
 
-			if (currentScrollY < lastScrollY) {
-				setVisible(true);
-			} else if (currentScrollY > lastScrollY && currentScrollY > 25) {
-				setVisible(false);
-			}
+      if (currentScrollY < lastScrollY) {
+        setVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 25) {
+        setVisible(false);
+      }
 
-			setLastScrollY(currentScrollY);
-		};
+      setLastScrollY(currentScrollY);
+    };
 
-		window.addEventListener("scroll", onScroll);
-		return () => window.removeEventListener("scroll", onScroll);
-	}, [lastScrollY]);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [lastScrollY]);
 
-	const [username, setUsername] = useState<string | null>(null);
-	const [loading, setLoading] = useState(true);
-	const avatarLink = "";
+  const [username, setUsername] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const avatarLink = "";
 
-	useEffect(() => {
-		const loadMe = async () => {
-			try {
-				const res = await fetch("/api/auth/me");
-				if (!res.ok) return;
+  useEffect(() => {
+    const loadMe = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (!res.ok) return;
 
-				const data = await res.json();
-				if (data?.user?.username) {
-					setUsername(data.user.username);
-				}
-			} finally {
-				setLoading(false);
-			}
-		};
+        const data = await res.json();
+        if (data?.user?.username) {
+          setUsername(data.user.username);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-		loadMe();
-	}, []);
+    loadMe();
+  }, []);
 
-	return (
-		<>
-			<header
-				className={`${styles.header} ${
-					visible ? styles.show : styles.hide
-				}`}
-			>
-				<Brand_banner></Brand_banner>
+  return (
+    <>
+      <header
+        className={`${styles.header} ${visible ? styles.show : styles.hide}`}
+      >
+        <Brand_banner></Brand_banner>
 
-				<Link href={`/disk/${username ? username : ""}`}>Мой диск</Link>
+        <Link href={`/disk/${username ? username : ""}`}>Мой диск</Link>
 
-				<div className="authButtons">
-					{loading ? null : username ? (
-						<>
-							<User_card
-								username={username}
-								avatar_link={avatarLink}
-							/>
-						</>
-					) : (
-						<>
-							<Link href="/auth/login" className={styles.signIn}>
-								<Button>Sign In</Button>
-							</Link>
-							<Link
-								href="/auth/register"
-								className={styles.signUp}
-							>
-								<ButtonFill>Sign Up</ButtonFill>
-							</Link>
-						</>
-					)}
-				</div>
-			</header>
-		</>
-	);
+        <div className="authButtons">
+          {loading ? null : username ? (
+            <>
+              <User_card username={username} avatar_link={avatarLink} />
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className={styles.signIn}>
+                <Button>Sign In</Button>
+              </Link>
+              <Link href="/auth/register" className={styles.signUp}>
+                <ButtonFill>Sign Up</ButtonFill>
+              </Link>
+            </>
+          )}
+        </div>
+      </header>
+    </>
+  );
 };
 
 export default Header;
-

@@ -1,11 +1,10 @@
 import styles from "./button.module.css";
 const Button = ({
-	children,
+  children,
 }: Readonly<{
-	children?: React.ReactNode;
+  children?: React.ReactNode;
 }>) => {
-	return <button className={styles.button}>{children}</button>;
+  return <button className={styles.button}>{children}</button>;
 };
 
 export default Button;
-

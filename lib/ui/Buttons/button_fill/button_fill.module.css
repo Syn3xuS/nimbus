@@ -1,8 +1,0 @@
-.button_fill {
-	background: var(--accent);
-	color: var(--background);
-}
-
-.button_fill:hover {
-	opacity: 0.85;
-}

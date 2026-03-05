@@ -2,39 +2,38 @@ import argon2 from "argon2";
 import { readDB, writeDB } from "@/server/db/db";
 
 export async function registerUser(input: {
-	email: string;
-	username: string;
-	password: string;
+  email: string;
+  username: string;
+  password: string;
 }) {
-	const { email, username, password } = input;
+  const { email, username, password } = input;
 
-	if (!email || !username || !password) {
-		throw new Error("Invalid data");
-	}
+  if (!email || !username || !password) {
+    throw new Error("Invalid data");
+  }
 
-	const db = await readDB();
+  const db = await readDB();
 
-	const exists = db.users.find(
-		(u) => u.email === email || u.username === username,
-	);
+  const exists = db.users.find(
+    (u) => u.email === email || u.username === username,
+  );
 
-	if (exists) {
-		throw new Error("User already exists");
-	}
+  if (exists) {
+    throw new Error("User already exists");
+  }
 
-	const passwordHash = await argon2.hash(password);
+  const passwordHash = await argon2.hash(password);
 
-	const user = {
-		id: crypto.randomUUID(),
-		email,
-		username,
-		passwordHash,
-		createdAt: new Date().toISOString(),
-	};
+  const user = {
+    id: crypto.randomUUID(),
+    email,
+    username,
+    passwordHash,
+    createdAt: new Date().toISOString(),
+  };
 
-	db.users.push(user);
-	await writeDB(db);
+  db.users.push(user);
+  await writeDB(db);
 
-	return user;
+  return user;
 }
-

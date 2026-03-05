@@ -1,6 +1,6 @@
 {
 	"name": "nimbus",
-	"version": "0.1.1beta",
+	"version": "0.1.2beta",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
